@@ -70,6 +70,8 @@ Finding:     DB_PASSWORD = "xQ7mK2pL9wR4tY6u"
 5:25AM WRN leaks found: 2
 ```
 
+![Semgrep and Gitleaks Scan Results](img/task012.png)
+
 **Task 1 — SAST sweep with Semgrep (25 min)** · *Goal:* find code flaws. *Steps:* read the Semgrep output; locate the SQL injection in `/user` (CWE-89, string-formatted query), the OS command injection in `/ping` (CWE-78, `shell=True`), the weak `md5` password hash (CWE-327), and `debug=True` (CWE-489). *Deliverable:* one screenshot per finding with the file:line.
 
 **Task 1 findings & mitigations:**
@@ -150,6 +152,8 @@ SUMMARY: AddressSanitizer: heap-buffer-overflow /work/harness.c:23:21 in LLVMFuz
 artifact_prefix='./'; Test unit written to ./crash-0eb8e4ed029b774d80f2b66408203801cb982a60
 ```
 
+![AddressSanitizer Fuzzing Crash](img/task4.png)
+
 **Why fuzzing finds this bug when SAST / linters miss it:**
 Static linters only check syntax rules or shallow taint flows, but they fail to track the exact integer boundary relationship where entering the block with `size == 3` causes `data[3]` to index past the 3-byte allocation because the programmer forgot `size > 3`. Coverage-guided fuzzing, however, tracks actual runtime branches and feeds mutating byte sequences directly through the compiled binary, allowing AddressSanitizer to immediately catch the physical out-of-bounds read when `FUZ` is processed.
 
@@ -173,6 +177,8 @@ Static linters only check syntax rules or shallow taint flows, but they fail to 
      - `CVE-2025-50181` (Medium, CWE-400) | PoolManager retry loop denial of service.
      - `CVE-2026-44431` (Medium, CWE-200) | Information disclosure via cross-origin header forwarding.
    - `werkzeug` / `requests`: outdated pinned versions with known denial of service and parsing vulnerabilities.
+
+![NoteVault Project Scan](img/task5.png)
 
 **Task 6 — Build a security CI gate (25 min)** · *Goal:* automate the scan (previews Week 15). *Steps:* adapt `../week15-devsecops-pipeline/security-ci.yml` into a workflow that runs Semgrep + Trivy + Gitleaks and **fails on HIGH/CRITICAL**; run it locally (`act`) or commit to your fork and read the Actions log. *Deliverable:* the workflow file + a screenshot of a failing run.
 
@@ -243,6 +249,8 @@ jobs:
 
 **Failing run observation:**
 When pushed to the repository containing the unpatched `vulnerable-repo/app.py`, the Semgrep step exited with code 1 due to the 10 blocking rules (SQLi, command injection, weak MD5), immediately failing Job 2 and halting the pull request merge before the code could reach production.
+
+![Security CI Gate Failure](img/task6.png)
 
 **Task 7 — SAST blind spots (20 min)** · *Goal:* see what scanners miss. *Steps:* find one real bug in `vulnerable-repo/app.py` (or NoteVault) that Semgrep did **not** flag, and explain why a pattern-based tool missed it. *Deliverable:* the bug + a 2-sentence explanation.
 
@@ -317,6 +325,8 @@ When pushed to the repository containing the unpatched `vulnerable-repo/app.py`,
 Ran `bash scan.sh` after applying changes:
 - Semgrep findings: **0** (0 blocking)
 - Gitleaks findings: **0** leaks found
+
+![Remediated Clean Scan](img/task8.png)
 
 ## Part 4 — Reflection
 1. **Map two of your findings to their CWE and to the matching OWASP 2025 category:**
