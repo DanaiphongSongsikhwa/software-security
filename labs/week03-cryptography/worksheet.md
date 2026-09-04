@@ -166,6 +166,8 @@ Tamper check: SUCCESS -> Integrity verification caught alteration: MAC check fai
 ```
 - **Tampered fails proof:** When byte 0 of the ciphertext was modified via `bytes([ct[0] ^ 0x01]) + ct[1:]`, calling `cipher.decrypt_and_verify()` raised `ValueError: MAC check failed`, showing AES-GCM guarantees data integrity alongside confidentiality.
 
+![Task 7 & Task 9 Remediated Crypto Solution](img/task9_7_3.png)
+
 **Task 8 — TLS in practice (15 min)** · *Goal:* read a real cert. *Steps:* run `openssl s_client -connect example.com:443 </dev/null 2>/dev/null | tee /tmp/tls.txt | openssl x509 -noout -issuer -subject -dates` for the cert summary, then `grep -E 'Protocol|New,' /tmp/tls.txt` for the negotiated TLS version (the version line is printed by `s_client`, not by `x509`, so the plain pipe would discard it); identify issuer, validity, and that TLS version. *Deliverable:* the cert summary + one line on what TLS protects that hashing/at-rest encryption does not.
 
 **Task 8 Output:**
@@ -190,7 +192,7 @@ Protocol: TLSv1.3
 | `HARDCODED_KEY = b"0123..."` | `os.environ.get("ENC_KEY_HEX")` | **CWE-798** |
 | `random.choice("0123456789")` | `secrets.token_urlsafe(16)` | **CWE-330** |
 
-- **Screenshot placeholder:** `![Task 9 Fixed Script Running](img/task9.png)`
+![Task 9 Remediated Implementation Verification](img/task9_7_3.png)
 
 ## Part 4 — Reflection
 1. **Map each of the four misuses to its CWE and to OWASP A04, in one line each:**
