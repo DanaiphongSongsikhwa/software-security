@@ -2,7 +2,7 @@
 
 ## 1. Data-flow diagram
 
-![DFD](task1.png)
+![DFD](img/task1.png)
 
 Here's what happens in the app:
 
