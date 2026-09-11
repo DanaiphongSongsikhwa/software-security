@@ -50,7 +50,10 @@ docker compose up            # builds python:3.12-slim, installs flask, runs vul
 **Task 0 — Onboarding (5 min)**
 - **Normal login URL:** `http://localhost:8080/login?user=alice&pw=alicepw`
 - **Output:** `Welcome alice`
-- **Screenshot:** `![Task 0 Onboarding](img/task0.png)`
+- **Screenshot:**
+
+![Task 0 Onboarding](img/task0.png)
+
 - **Mitigation:** Use prepared statements with bound parameters so credentials are safe and cannot be bypassed via injection.
 
 ```mermaid
@@ -70,7 +73,10 @@ sequenceDiagram
 - **Payload 1 (Inline Comment):** `http://localhost:8080/login?user=alice'--&pw=x`
 - **Payload 2 (OR True Condition):** `http://localhost:8080/login?user=x' OR '1'='1'--&pw=x`
 - **Output:** `Welcome alice`
-- **Screenshot:** `![Task 1 SQLi Auth Bypass](img/task1.png)`
+- **Screenshot:**
+
+![Task 1 SQLi Auth Bypass](img/task1.png)
+
 - **Why `--` and `OR '1'='1'` work:**
   In Payload 1, `alice'--` breaks out of the single quotes and uses `--` to comment out the remaining `AND password = '%s'` clause, executing `SELECT id, username FROM users WHERE username = 'alice'`, which logs in as alice without checking any password. In Payload 2, `' OR '1'='1'--` forces the WHERE clause condition to evaluate to true for every single row in the database, returning the first record (`alice`) regardless of the password supplied.
 - **Mitigation:** Replace string concatenation with parameterized SQL queries (`WHERE username = ? AND password = ?`), passing `(user, pw)` as parameters so the database treats them as literal values rather than executable SQL syntax.
@@ -86,7 +92,10 @@ admin:FLAG{sqli_demo}
 alice:alicepw
 bob:bobpw
 ```
-- **Screenshot:** `![Task 2 UNION Credential Dump](img/task2.png)`
+- **Screenshot:**
+
+![Task 2 UNION Credential Dump](img/task2.png)
+
 - **Why column count must match:**
   The `UNION` operator appends the result rows of the second query to the first query. Because the original search query selects two columns (`SELECT id, username FROM users`), the injected query must also request exactly two columns (`username, password`); if the column counts differ, SQLite aborts the operation with an error.
 - **Mitigation:** Use bound parameter wildcards (`WHERE username LIKE ?`, `("%" + term + "%",)`) so user input cannot terminate the string literal or append a secondary UNION SELECT statement.
@@ -102,7 +111,10 @@ PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 uid=0(root) gid=0(root) groups=0(root)
 ```
-- **Screenshot:** `![Task 3 OS Command Injection](img/task3.png)`
+- **Screenshot:**
+
+![Task 3 OS Command Injection](img/task3.png)
+
 - **Explanation of `shell=True` flaw (CWE-78):**
   `subprocess.run("ping -c 1 " + host, shell=True)` invokes `/bin/sh` to interpret the whole command string. The shell treats `;` as a command separator, causing it to run `ping -c 1 127.0.0.1` first, and then execute the injected command `id` directly on the server with root privileges.
 - **Mitigation:** Avoid the system shell by passing command arguments as a list with `shell=False` (`subprocess.run(["ping", "-c", "1", host], shell=False)`), and enforce regex validation (`^[A-Za-z0-9_.-]+$`) on the host input before execution.
@@ -113,7 +125,10 @@ uid=0(root) gid=0(root) groups=0(root)
 curl -X POST http://localhost:8080/upload -F "f=@shell.py"
 ```
 - **Output:** `saved to /tmp/uploads/shell.py`
-- **Screenshot:** `![Task 4 Unrestricted File Upload](img/task4.png)`
+- **Screenshot:**
+
+![Task 4 Unrestricted File Upload](img/task4.png)
+
 - **Why extension allow-listing matters (CWE-434):**
   Without strict file extension checks, attackers can upload executable script files (`.py`, `.php`, `.sh`) containing web shells. If the destination directory is within a web-accessible or executed path, requesting or invoking the file grants instant Remote Code Execution. Enforcing an allow-list (`.txt`, `.png`, `.jpg`, `.pdf`) and storing uploads outside the executable web root prevents dangerous file execution.
 
@@ -127,7 +142,9 @@ curl -X POST http://localhost:8080/upload -F "f=@shell.py"
      - **Fix line:** Lines 74–77 (`if not re.fullmatch(r"[A-Za-z0-9_.-]+", host): return "invalid host\n", 400` and `subprocess.run(["ping", "-c", "1", host], shell=False)`).
   4. **Unrestricted Upload (`shell.py`):** Returns `file type not allowed` (HTTP 400).
      - **Fix line:** Lines 86–93 (`name = secure_filename(f.filename)`, `if ext not in ALLOWED_EXT: return "file type not allowed\n", 400`).
-- **Screenshot:** `![Task 5 Defended Solution Verification](img/task5.png)`
+- **Screenshot:**
+
+![Task 5 Defended Solution Verification](img/task5.png)
 
 ## Part 4 — Reflection
 
