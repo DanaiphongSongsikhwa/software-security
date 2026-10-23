@@ -12,7 +12,7 @@
 |------|-----------|------|-------|
 | Danaiphong Songsikhwa | 6631503106 | 23 October 2026 | Not provided |
 
-**AI use:** Codex helped explain the questions, draft these answers, and run the local scans, build, hash check, and SBOM generation. Screenshots and the account-based signing steps are still pending. The results below are assistant-run results, not a claim that the student has already repeated them.
+**AI use:** Codex helped explain the questions, draft these answers, and run the local scans, build, hash check, and SBOM generation. The student has supplied six screenshots, included below. The remaining evidence and account-based signing steps are still pending. The results below are assistant-run results, not a claim that the student has already repeated them.
 
 **Branch:** `wk12_6631503106`. Work stays in this branch; it is not merged into `main`.
 
@@ -82,7 +82,9 @@ These old versions make the lab useful for SCA practice. They map to A03:2025 an
 
 Command: `cat requirements.txt`.
 
-[Insert Screenshot of Task 0 here: dependency versions and identity stamp]
+**Task 0 screenshot**
+
+![Task 0 - Pinned packages and versions](img/task0.png)
 
 
 ### Task 1 — SCA scan: build the remediation worklist (35 min)
@@ -113,7 +115,13 @@ These are fixes for the selected advisories, not a claim that those versions fix
 
 Remediation (A03 / CWE-1395): Keep a reviewed dependency set and check it in CI. A successful script exit is not enough here because `sca_scan.sh` uses `|| true`; read the actual reports and make scanner errors fail the real release pipeline.
 
-[Insert Screenshot of Task 1 here: Trivy findings and pip-audit results; use more than one image if needed]
+**Task 1 screenshot**
+
+![Task 1 - Vulnerability scan output](img/task1.png)
+
+The supplied screenshot shows part of the image-scan output. The three-row remediation table above comes from the full scan logs; those selected Flask/Werkzeug rows and the pip-audit summary are not all visible in this image.
+
+[Insert an additional Screenshot of Task 1 here: the three selected findings and pip-audit summary]
 
 
 ### Task 2 — Dependency Confusion Heist (35 min)
@@ -152,13 +160,15 @@ The expected simulation results for the same version pair are:
 | Merged / extra index | 1.4.0 | 99.0.0 | Public 99.0.0 | Highest eligible version across both sources |
 | Single trusted private index | 1.4.0 | 99.0.0 | Private 1.4.0 | Public candidates are not queried |
 
-These are the rule-based answers; the course simulation still needs to be opened and captured. In the "win the race" preset, a higher private version may win today, but the attacker can publish a still higher public version. Increasing our version number does not remove the untrusted source.
+These are the rule-based answers. The supplied screenshot confirms the merged-index result; the single-index and win-the-race screenshots are still missing. In the "win the race" preset, a higher private version may win today, but the attacker can publish a still higher public version. Increasing our version number does not remove the untrusted source.
 
 The original Markdown contains a `resolver-confusion` simulation marker rather than a local executable registry. Use the course page that renders that simulation. Do not install or publish a package called `acme-internal-utils` as a substitute for this step.
 
 Remediation (A03 / CWE-1357): Use one controlled index that keeps internal names internal, then verify approved hashes. A merged list of sources is not a trust policy.
 
-[Insert Screenshot of Task 2A here: merged-index verdict, private 1.4.0 versus public 99.0.0]
+**Task 2A screenshot - Merged index**
+
+![Task 2A - Public version 99.0.0 selected in merged-index mode](img/task2.png)
 
 [Insert Screenshot of Task 2B here: single-index verdict for the same versions]
 
@@ -223,11 +233,15 @@ The broad filters above are only for asking whether the test image has any accep
 
 Remediation (A08): Verify the immutable artifact digest and the exact approved identity before deployment. Signing establishes who approved the bytes, not whether those bytes contain a vulnerability. [3]
 
-[Insert Screenshot of Task 3A here: Flask component in the generated SBOM]
+**Task 3A screenshot - SBOM**
+
+![Task 3A - Flask component in the CycloneDX SBOM](img/task3A.png)
 
 [Insert Screenshot of Task 3B here: successful verification of your signed registry image - pending OIDC/registry setup]
 
-[Insert Screenshot of Task 3C here: actual unsigned-image verification failure]
+**Task 3C screenshot - Unsigned image rejected**
+
+![Task 3C - Cosign reports no signatures found](img/task3C.png)
 
 
 ### Task 4 — Defend / fix it (35 min)
@@ -269,7 +283,9 @@ For a deploy gate, require a successful `cosign verify` for the expected signer 
 
 My first choice would be a controlled index with enforced internal-name ownership, backed by a reviewed hash lockfile. It prevents an unrelated public package from becoming a candidate instead of hoping its version stays lower. These controls address A03/CWE-1357; the signature and provenance gate addresses A08. The refusal test is verified, while the registry-backed gate is still pending.
 
-[Insert Screenshot of Task 4A here: required-hash refusal and the printed SHA-256 hash]
+**Task 4A screenshot - Required hashes**
+
+![Task 4A - pip refuses installation without approved hashes](img/task4.png)
 
 [Insert Screenshot of Task 4B here: single-index simulation verdict; the Task 2B image may be reused]
 
@@ -379,7 +395,7 @@ This app installs the versions listed in its requirements file, so an unsafe dep
 
 **Final prompt:** "Review this Week12 package-install and image-verification workflow. Explain the effect of exact version pins and merged indexes. Propose a single trusted-index policy and a complete reviewed hash lockfile, including transitive packages. For the deploy gate, require an immutable image digest, an exact approved OIDC signer identity and issuer, and separate signed-provenance checks for the builder, source repository and commit. Fail closed on missing settings, failed verification, and scanner errors. Do not claim that a signature proves safe code or that an SBOM alone reaches SLSA L2. State which checks were actually run and which require registry/OIDC access."
 
-**Result:** The review produced the corrected commands and policies in Tasks 3 and 4. The initial package install with required hashes failed as intended, the unsigned-image verification returned `no signatures found`, and the SBOM was generated from the local image. The resolver answers describe the simulation's rules; its screenshots are still needed. The signed-image acceptance and wrong-identity rejection tests remain pending, so the complete deploy gate is not yet verified.
+**Result:** The review produced the corrected commands and policies in Tasks 3 and 4. The initial package install with required hashes failed as intended, the unsigned-image verification returned `no signatures found`, and the SBOM was generated from the local image. The merged-index result is shown in the student screenshot. The single-index and win-the-race screenshots are still needed. The signed-image acceptance and wrong-identity rejection tests remain pending, so the complete deploy gate is not yet verified.
 
 ## Screenshot checklist
 
@@ -390,7 +406,7 @@ printf '%s | %s | ' "$(whoami)" '6631503106'
 TZ=Asia/Bangkok date '+%F %T %Z'
 ```
 
-Keep the stamp and the relevant output in the same image. For the browser simulation, put the identity terminal beside the browser and capture both. Save images in this folder's `img/` directory and replace the corresponding `[Insert Screenshot ...]` text with an image link. This draft does not contain screenshots yet.
+Keep the stamp and the relevant output in the same image. For the browser simulation, put the identity terminal beside the browser and capture both. Six student screenshots from `img/` are included at the relevant tasks. Any remaining `[Insert Screenshot ...]` text identifies evidence still to be added. The supplied Task 2 image shows only merged-index mode, so it cannot also prove the single-index defense.
 
 ## References
 
