@@ -5,9 +5,12 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatte
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, NextPageTemplate, PageBreak, Image
+from PIL import Image as PILImage
+from urllib.parse import unquote
 base=Path(__file__).resolve().parents[2]
-out=base/'output/pdf/Wk10_6631503106_DRAFT.pdf'
+out=base/'labs/week10-api-security/Wk10_6631503106.pdf'
 out.parent.mkdir(parents=True, exist_ok=True)
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -32,17 +35,31 @@ for name in ('Heading1', 'Heading2', 'Heading3'):
 styles.add(ParagraphStyle(name='CodeSmall', fontName='LabMono', fontSize=7, leading=9, spaceAfter=5, backColor=colors.HexColor('#f2f5f7'), borderPadding=6))
 styles.add(ParagraphStyle(name='CellSmall', fontName='LabSans', fontSize=8, leading=11, spaceAfter=0))
 def norm(s):
- return s.replace('\u2014','-').replace('\u2013','-').replace('\u2019',"'").replace('\u201c','"').replace('\u201d','"')
+ return s.replace('🤖','').replace('🧠','').replace('\u2014','-').replace('\u2013','-').replace('\u2019',"'").replace('\u201c','"').replace('\u201d','"')
 def inline(s):
  s=escape(norm(s))
  s=re.sub(r'`([^`]+)`',r'<font name="LabMono">\1</font>',s)
  s=re.sub(r'\*\*([^*]+)\*\*',r'<b>\1</b>',s)
  return s
-lines=(base/'submissions/week10_6631503106/Wk10_6631503106.md').read_text().splitlines()
+lines=(base/'labs/week10-api-security/worksheet.md').read_text().splitlines()
 story=[]; i=0
 while i<len(lines):
  line=lines[i]
- if line.startswith('```'):
+ if line.startswith('>'):
+  i+=1; continue
+ elif line.startswith('!['):
+  match=re.match(r'!\[(.*?)\]\((.*?)\)$',line)
+  if match:
+   path=base/'labs/week10-api-security'/unquote(match[2].strip('<>'))
+   if path.suffix.lower()=='.png':
+    w,h=PILImage.open(path).size
+    pw,ph=landscape(A4)
+    scale=min((pw-70)/w,(ph-135)/h)
+    story.extend([NextPageTemplate('evidence'),PageBreak(),Paragraph(inline(match[1]),styles['Heading2']),Image(str(path),width=w*scale,height=h*scale)])
+    following=next((line for line in lines[i+1:] if line.strip()), '')
+    if not following.startswith('!['):
+     story.extend([NextPageTemplate('text'),PageBreak()])
+ elif line.startswith('```'):
   i+=1; code=[]
   while i<len(lines) and not lines[i].startswith('```'):
    code.extend(textwrap.wrap(norm(lines[i]), width=104, replace_whitespace=False, drop_whitespace=False) or [''])
@@ -71,13 +88,18 @@ while i<len(lines):
   story.append(Paragraph(inline(line[depth:].strip()),styles['Heading'+str(min(depth,3))]))
  elif line.strip():
   para=[line.strip()]
-  while i+1<len(lines) and lines[i+1].strip() and not lines[i+1].startswith(('#','|','```')):
+  while i+1<len(lines) and lines[i+1].strip() and not lines[i+1].startswith(('#','|','```','![')):
    i+=1; para.append(lines[i].strip())
   story.append(Paragraph(inline(' '.join(para)),styles['Normal']))
  i+=1
 def footer(canvas, doc):
  canvas.saveState(); canvas.setFont('LabSans',8); canvas.setFillColor(colors.HexColor('#516778'))
- canvas.drawString(44,25,'Week 10 | 6631503106 | DRAFT - screenshots pending')
- canvas.drawRightString(A4[0]-44,25,str(doc.page)); canvas.restoreState()
-SimpleDocTemplate(str(out),pagesize=A4,rightMargin=44,leftMargin=44,topMargin=38,bottomMargin=44,title='Week 10 API Security - Draft',author='Danaiphong Songsikhwa; AI assistance disclosed').build(story,onFirstPage=footer,onLaterPages=footer)
+ canvas.drawString(44,25,'Week 10 | 6631503106 | API Security')
+ canvas.drawRightString(canvas._pagesize[0]-44,25,str(doc.page)); canvas.restoreState()
+doc=BaseDocTemplate(str(out),pagesize=A4,title='Week 10 API Security',author='Danaiphong Songsikhwa; AI assistance disclosed')
+doc.addPageTemplates([
+ PageTemplate(id='text',pagesize=A4,frames=[Frame(44,44,A4[0]-88,A4[1]-82,id='textframe')],onPage=footer),
+ PageTemplate(id='evidence',pagesize=landscape(A4),frames=[Frame(30,35,landscape(A4)[0]-60,landscape(A4)[1]-65,id='imageframe')],onPage=footer)
+])
+doc.build(story)
 print(out)
