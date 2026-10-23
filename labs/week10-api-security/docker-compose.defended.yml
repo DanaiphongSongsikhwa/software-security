@@ -1,0 +1,12 @@
+# Add the student defense while retaining the original two grading targets.
+# docker compose -f docker-compose.yml -f docker-compose.defended.yml up -d
+services:
+  student-api:
+    image: python:3.12-slim
+    working_dir: /lab
+    volumes:
+      - ./:/lab
+    ports:
+      - "127.0.0.1:8082:5002"
+    command: >
+      bash -c "pip install --no-cache-dir flask && python defended_api.py"
