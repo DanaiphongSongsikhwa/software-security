@@ -1,0 +1,10 @@
+2026-10-23T16:07:55Z	INFO	"--format cyclonedx" disables security scanning. Specify "--scanners vuln" explicitly if you want to include vulnerabilities in the "cyclonedx" report.
+2026-10-23T16:07:55Z	INFO	[python] Licenses acquired from one or more METADATA files may be subject to additional terms. Use `--debug` flag to see all affected packages.
+2026-10-23T16:07:55Z	INFO	Detected OS	family="debian" version="13.1"
+2026-10-23T16:07:55Z	INFO	Number of language-specific files	num=1
+
+📣 [34mNotices:[0m
+  - Version 0.76.1 of Trivy is now available, current version is 0.74.0
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+

@@ -1,0 +1,51 @@
+Unable to find image 'gcr.io/projectsigstore/cosign:latest' locally
+latest: Pulling from projectsigstore/cosign
+2cc7ee286bf3: Pulling fs layer
+f6069939f718: Pulling fs layer
+7c12895b777b: Pulling fs layer
+c172f21841df: Pulling fs layer
+218cf840d0d9: Pulling fs layer
+3214acf345c0: Pulling fs layer
+d6b1b89eccac: Pulling fs layer
+2780920e5dbf: Pulling fs layer
+39bda24bc0a9: Pulling fs layer
+52630fc75a18: Pulling fs layer
+dd64bf2dd177: Pulling fs layer
+b839dfae01f6: Pulling fs layer
+ebddc55facdc: Pulling fs layer
+a0921f9d8de9: Pulling fs layer
+250c06f7c38e: Pulling fs layer
+250c06f7c38e: Download complete
+7c12895b777b: Download complete
+c172f21841df: Download complete
+f6069939f718: Download complete
+2cc7ee286bf3: Download complete
+c172f21841df: Pull complete
+2cc7ee286bf3: Pull complete
+3214acf345c0: Download complete
+2780920e5dbf: Download complete
+d6b1b89eccac: Download complete
+52630fc75a18: Download complete
+218cf840d0d9: Download complete
+7c12895b777b: Pull complete
+f6069939f718: Pull complete
+3214acf345c0: Pull complete
+2780920e5dbf: Pull complete
+d6b1b89eccac: Pull complete
+52630fc75a18: Pull complete
+218cf840d0d9: Pull complete
+b839dfae01f6: Download complete
+dd64bf2dd177: Download complete
+b839dfae01f6: Pull complete
+dd64bf2dd177: Pull complete
+ebddc55facdc: Download complete
+ebddc55facdc: Pull complete
+a0921f9d8de9: Download complete
+250c06f7c38e: Pull complete
+a0921f9d8de9: Pull complete
+39bda24bc0a9: Download complete
+39bda24bc0a9: Pull complete
+Digest: sha256:0f06154836d2de34f887a5c273506d52ca43edaa1d9e53e6510fa78a48f69c2d
+Status: Downloaded newer image for gcr.io/projectsigstore/cosign:latest
+Error: no signatures found
+error during command execution: no signatures found
