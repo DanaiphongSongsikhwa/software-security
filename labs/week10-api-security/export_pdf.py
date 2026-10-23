@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatte
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, NextPageTemplate, PageBreak, Image
 from PIL import Image as PILImage
 from urllib.parse import unquote
@@ -53,8 +53,9 @@ while i<len(lines):
    path=base/'labs/week10-api-security'/unquote(match[2].strip('<>'))
    if path.suffix.lower()=='.png':
     w,h=PILImage.open(path).size
-    pw,ph=landscape(A4)
-    scale=min((pw-70)/w,(ph-135)/h)
+    # Use the same A4 portrait page and margins as the worksheet text.
+    pw,ph=A4
+    scale=min((pw-100)/w,(ph-150)/h)
     story.extend([NextPageTemplate('evidence'),PageBreak(),Paragraph(inline(match[1]),styles['Heading2']),Image(str(path),width=w*scale,height=h*scale)])
     following=next((line for line in lines[i+1:] if line.strip()), '')
     if not following.startswith('!['):
@@ -99,7 +100,7 @@ def footer(canvas, doc):
 doc=BaseDocTemplate(str(out),pagesize=A4,title='Week 10 API Security',author='Danaiphong Songsikhwa; AI assistance disclosed')
 doc.addPageTemplates([
  PageTemplate(id='text',pagesize=A4,frames=[Frame(44,44,A4[0]-88,A4[1]-82,id='textframe')],onPage=footer),
- PageTemplate(id='evidence',pagesize=landscape(A4),frames=[Frame(30,35,landscape(A4)[0]-60,landscape(A4)[1]-65,id='imageframe')],onPage=footer)
+ PageTemplate(id='evidence',pagesize=A4,frames=[Frame(44,44,A4[0]-88,A4[1]-82,id='imageframe')],onPage=footer)
 ])
 doc.build(story)
 print(out)
