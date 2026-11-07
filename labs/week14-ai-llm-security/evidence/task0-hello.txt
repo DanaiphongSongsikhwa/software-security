@@ -1,0 +1,6 @@
+$ curl -s 'http://localhost:8082/?msg=hello'
+<h2>HelpBot — Week 14 INSECURE chatbot</h2>
+<div style="border:1px solid #ccc;padding:8px;margin-top:8px">Hello! I'm HelpBot. How can I help you today?</div>
+$ curl -s 'http://localhost:8083/?msg=hello'
+<h2>HelpBot — Week 14 GUARDED chatbot</h2>
+<div style="border:1px solid #ccc;padding:8px;margin-top:8px">Hello! I&#x27;m HelpBot. How can I help you today?</div>

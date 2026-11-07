@@ -1,0 +1,10 @@
+$ curl -s "http://localhost:8082/?msg=%3Cscript%3Ealert%281%29%3C%2Fscript%3E"
+You said: <script>alert(1)</script>
+$ curl -s "http://localhost:8083/?msg=%3Cscript%3Ealert%281%29%3C%2Fscript%3E"
+You said: &lt;script&gt;alert(1)&lt;/script&gt;
+
+$ curl -s "http://localhost:8082/?msg=%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E"
+You said: <img src=x onerror=alert(1)>
+$ curl -s "http://localhost:8083/?msg=%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E"
+You said: &lt;img src=x onerror=alert(1)&gt;
+
