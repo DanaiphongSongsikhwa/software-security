@@ -1,0 +1,94 @@
+--- Dockerfile.insecure	2026-08-15 22:35:22.350145759 +0700
++++ Dockerfile.hardened	2026-08-15 22:35:22.349837449 +0700
+@@ -1,38 +1,64 @@
+ # Sandbox/teaching only; for authorized lab use.
+ #
+-# Week 13 — INSECURE Dockerfile (the "before"). Every line is a teaching
+-# defect. Run `trivy config` against it to see the findings light up, then
+-# compare with Dockerfile.hardened. DO NOT ship anything like this.
++# Week 13 — HARDENED Dockerfile (the "after"). Each fix maps 1:1 to a defect
++# in Dockerfile.insecure. Re-run `trivy config` to confirm findings drop.
+ #
+ # OWASP 2025 A02 Security Misconfiguration.
+ 
+-# DEFECT: ':latest' is unpinned and non-reproducible — today's build != next
+-# week's. CWE-1104 (unmaintained/uncontrolled component version), CWE-16.
+-FROM python:latest
+-
+-# DEFECT: hard-coded secret baked into an ENV layer. Anyone with the image
+-# can `docker history` / `docker inspect` and read it. CWE-798 (hard-coded
+-# credentials), CWE-200 (information exposure), CWE-16.
+-ENV API_TOKEN=sk_live_supersecret_DO_NOT_DO_THIS
+-ENV AWS_SECRET_ACCESS_KEY=AKIAEXAMPLEdeadbeefdeadbeef
++# ------------------------------------------------------------------
++# Build stage: install deps in a full image we will THROW AWAY.
++# ------------------------------------------------------------------
++# FIX: pin to an immutable digest, not :latest, for reproducible builds.
++# Use python 3.11 to match the distroless runtime below (debian12 = Python 3.11)
++# so the copied venv works. Refresh the digest with:
++#   docker buildx imagetools inspect python:3.11-slim
++FROM python:3.11-slim@sha256:cdbd05fb6f457ca275ff51ce00d93d865ca0b6a25f5ffb08262d94f6835771e5 AS build
+ 
+ WORKDIR /app
+ 
+-# DEFECT: copies the ENTIRE build context — including .git, .env, keys,
+-# node_modules, CI files — into the image. Bloats it and leaks secrets.
+-# CWE-538 (insertion of sensitive info into externally accessible file).
+-COPY . .
+-
+-# DEFECT: unpinned install; also runs as root (default). No --no-cache-dir.
+-RUN pip install -r requirements.txt
+-
+-# DEFECT: world-writable app dir. CWE-732 (incorrect permission assignment
+-# for critical resource) — any process in the container can tamper with code.
+-RUN chmod -R 777 /app
++# FIX: copy only the manifest first (better caching, no stray files yet).
++COPY requirements.txt .
++
++# FIX: pinned, reproducible install into a venv we can copy out cleanly.
++RUN python -m venv /venv \
++    && /venv/bin/pip install --no-cache-dir -r requirements.txt
++
++# FIX: copy ONLY the app code, not the whole context. Pair with a .dockerignore
++# that excludes .git, .env, secrets, etc. (addresses CWE-538).
++COPY app.py .
++
++# ------------------------------------------------------------------
++# Runtime stage: distroless — no shell, no package manager, tiny attack
++# surface (gcr.io/distroless/python3), pinned by digest like the build stage.
++#
++# The pin is not decoration. Left as a bare `FROM gcr.io/distroless/python3-debian12`
++# this resolves to :latest, and `trivy config` flags the "after" file with the
++# very rule the "before" file is supposed to own — DS-0001, ':latest' tag used.
++# Task 4 asks students to prove the hardened build is clean, and it was not.
++# harden.md row 1 prescribes this fix; the reference implementation now follows
++# its own checklist. Refresh with:
++#   docker buildx imagetools inspect gcr.io/distroless/python3-debian12
++# ------------------------------------------------------------------
++FROM gcr.io/distroless/python3-debian12@sha256:2fdb05402a2cf21cf78fdb3ba4c5db167241e9e498140f5bf689d7efb773731f
++
++WORKDIR /app
++
++# Bring over only the venv and the app from the build stage.
++COPY --from=build /venv /venv
++COPY --from=build /app/app.py /app/app.py
++
++# FIX: no secrets in ENV. Inject at runtime via a secrets manager / mounted
++# file / orchestrator secret — never baked into a layer. (fixes CWE-798/200)
++# PYTHONPATH points the distroless interpreter at the copied venv's packages
++# (build stage is python:3.11-slim to match distroless debian12 = Python 3.11).
++ENV PATH="/venv/bin:$PATH" \
++    PYTHONPATH="/venv/lib/python3.11/site-packages"
++
++# FIX: run as a non-root user. distroless ships uid 65532 ("nonroot").
++# Fixes CWE-250 (unnecessary privileges) and limits CWE-732 blast radius.
++USER 65532:65532
+ 
+ EXPOSE 5000
+ 
+-# DEFECT: no USER directive, so the container runs as root (uid 0). A
+-# container escape or RCE then has root. CWE-250 (execution with unnecessary
+-# privileges).
+-CMD ["python", "app.py"]
++# distroless python3 image's entrypoint is already `python3`.
++CMD ["app.py"]

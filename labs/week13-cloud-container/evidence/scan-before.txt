@@ -1,0 +1,81 @@
+==> [1/2] trivy config — IaC / Dockerfile / IAM misconfiguration scan
+2026-11-07T15:01:05Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-11-07T15:01:05Z	INFO	[checks-client] Need to update the checks bundle
+2026-11-07T15:01:05Z	INFO	[checks-client] Downloading the checks bundle...
+234.57 KiB / 234.57 KiB [------------------------------------------------------] 100.00% ? p/s 200ms2026-11-07T15:01:07Z	INFO	Detected config files	num=2
+
+📣 Notices:
+  - Version 0.76.2 of Trivy is now available, current version is 0.74.0
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+
+
+Report Summary
+
+┌─────────────────────┬────────────┬───────────────────┐
+│       Target        │    Type    │ Misconfigurations │
+├─────────────────────┼────────────┼───────────────────┤
+│ Dockerfile.hardened │ dockerfile │         0         │
+├─────────────────────┼────────────┼───────────────────┤
+│ Dockerfile.insecure │ dockerfile │         4         │
+└─────────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+Dockerfile.insecure (dockerfile)
+================================
+Tests: 25 (SUCCESSES: 21, FAILURES: 4)
+Failures: 4 (MEDIUM: 1, HIGH: 1, CRITICAL: 2)
+
+DS-0001 (MEDIUM): Specify a tag in the 'FROM' statement for image 'python'
+════════════════════════════════════════
+When using a 'FROM' statement you should use a specific tag to avoid uncontrolled behavior when the image is updated.
+
+See https://avd.aquasec.com/misconfig/ds-0001
+────────────────────────────────────────
+ Dockerfile.insecure:11
+────────────────────────────────────────
+  11 [ FROM python:latest
+────────────────────────────────────────
+
+
+DS-0002 (HIGH): Specify at least 1 USER command in Dockerfile with non-root user as argument
+════════════════════════════════════════
+Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+
+See https://avd.aquasec.com/misconfig/ds-0002
+────────────────────────────────────────
+
+
+DS-0031 (CRITICAL): Possible exposure of secret env "API_TOKEN" in ENV
+════════════════════════════════════════
+Passing secrets via `build-args` or envs or copying secret files can leak them out
+
+See https://avd.aquasec.com/misconfig/ds-0031
+────────────────────────────────────────
+ Dockerfile.insecure:16
+────────────────────────────────────────
+  16 [ ENV API_TOKEN=sk_live_supersecret_DO_NOT_DO_THIS
+────────────────────────────────────────
+
+
+DS-0031 (CRITICAL): Possible exposure of secret env "AWS_SECRET_ACCESS_KEY" in ENV
+════════════════════════════════════════
+Passing secrets via `build-args` or envs or copying secret files can leak them out
+
+See https://avd.aquasec.com/misconfig/ds-0031
+────────────────────────────────────────
+ Dockerfile.insecure:17
+────────────────────────────────────────
+  17 [ ENV AWS_SECRET_ACCESS_KEY=AKIAEXAMPLEdeadbeefdeadbeef
+────────────────────────────────────────
+
+
+
+==> [2/2] trivy image — CVE scan of the hardened image (optional)
+    (image 'week13-hardened:lab' not built yet —
+     run: docker build -f Dockerfile.hardened -t week13-hardened:lab . )
+
+==> Done. See harden.md for the misconfig -> fix mapping.

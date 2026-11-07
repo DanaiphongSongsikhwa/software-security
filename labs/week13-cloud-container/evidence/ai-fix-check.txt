@@ -1,0 +1,9 @@
+$ docker build --build-arg API_TOKEN=sk_test_from_build_arg -t week13-aifix:lab .
+$ docker inspect --format "{{json .Config.Env}}" week13-aifix:lab
+["PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin","LANG=C.UTF-8","GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305","PYTHON_VERSION=3.12.14","PYTHON_SHA256=5c8462af5790baf43a321a1559dbe0db06d1be4300fb85fb53c40060668e548a","API_TOKEN=sk_test_from_build_arg"]
+$ docker history --no-trunc week13-aifix:lab | grep API_TOKEN
+API_TOKEN=sk_test_from_build_arg
+$ trivy config (AI Dockerfile)
+Failures: 2 (MEDIUM: 0, HIGH: 0, CRITICAL: 2)
+DS-0031 (CRITICAL): Possible exposure of secret env "API_TOKEN" in ARG
+DS-0031 (CRITICAL): Possible exposure of secret env "API_TOKEN" in ENV

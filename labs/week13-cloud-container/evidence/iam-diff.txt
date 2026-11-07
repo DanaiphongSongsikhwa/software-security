@@ -1,0 +1,36 @@
+--- iam-policy-insecure.json	2026-08-15 22:35:22.350145759 +0700
++++ iam-policy-leastpriv.json	2026-08-15 22:35:22.350145759 +0700
+@@ -1,12 +1,29 @@
+ {
+-  "_comment": "Sandbox/teaching only; for authorized lab use. INSECURE over-permissive AWS IAM policy. OWASP 2025 A02 Security Misconfiguration; CWE-732 incorrect permission assignment; CWE-269 improper privilege management. This grants every action on every resource = full admin = no least privilege. Compare with iam-policy-leastpriv.json.",
++  "_comment": "Sandbox/teaching only; for authorized lab use. Least-privilege rewrite of iam-policy-insecure.json. Scopes actions to exactly what the app needs (read objects from ONE bucket prefix) on EXACTLY the resources it needs. Addresses OWASP A02 / CWE-732 / CWE-269. Replace 'lab-app-bucket' with your bucket name.",
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+-      "Sid": "AllowEverythingDoNotUse",
++      "Sid": "ReadAppObjectsOnly",
+       "Effect": "Allow",
+-      "Action": "*",
+-      "Resource": "*"
++      "Action": [
++        "s3:GetObject"
++      ],
++      "Resource": "arn:aws:s3:::lab-app-bucket/app/*"
++    },
++    {
++      "Sid": "ListOnlyAppPrefix",
++      "Effect": "Allow",
++      "Action": [
++        "s3:ListBucket"
++      ],
++      "Resource": "arn:aws:s3:::lab-app-bucket",
++      "Condition": {
++        "StringLike": {
++          "s3:prefix": [
++            "app/*"
++          ]
++        }
++      }
+     }
+   ]
+ }

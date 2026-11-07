@@ -1,0 +1,8 @@
+$ docker run -d --rm --read-only --cap-drop ALL --security-opt no-new-privileges --memory 128m --pids-limit 64 -p 127.0.0.1:5013:5000 week13-hardened:lab
+$ curl -s http://127.0.0.1:5013/health
+{"status":"healthy"}
+
+$ docker inspect (security settings)
+ReadonlyRootfs=true CapDrop=[ALL] SecurityOpt=[no-new-privileges] User=65532:65532
+$ docker exec ... write test
+OSError: [Errno 30] Read-only file system: '/app/x'

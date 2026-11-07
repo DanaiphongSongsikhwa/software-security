@@ -1,0 +1,17 @@
+uid=0(root) gid=0(root) groups=0(root)
+drwxrwxrwx 1 root root 4096 Nov  7 15:01 /app
+total 64
+drwxrwxrwx 1 root root  4096 Nov  7 15:01 .
+drwxr-xr-x 1 root root  4096 Nov  7 15:04 ..
+-rwxrwxrwx 1 root root  2965 Aug 15 15:35 Dockerfile.hardened
+-rwxrwxrwx 1 root root  1535 Aug 15 15:35 Dockerfile.insecure
+-rwxrwxrwx 1 root root  2148 Aug 15 15:35 README.md
+-rwxrwxrwx 1 root root   638 Aug 15 15:35 app.py
+drwxrwxrwx 1 root root  4096 Nov  7 15:01 evidence
+-rwxrwxrwx 1 root root  2228 Aug 15 15:35 harden.md
+-rwxrwxrwx 1 root root   517 Aug 15 15:35 iam-policy-insecure.json
+-rwxrwxrwx 1 root root   844 Aug 15 15:35 iam-policy-leastpriv.json
+drwxrwxrwx 1 root root  4096 Aug 15 15:35 img
+-rwxrwxrwx 1 root root   278 Aug 15 15:35 requirements.txt
+-rwxrwxrwx 1 root root  2154 Aug 15 15:35 scan.sh
+-rwxrwxrwx 1 root root 10029 Aug 15 15:35 worksheet.md

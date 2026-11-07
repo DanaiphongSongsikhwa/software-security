@@ -1,0 +1,20 @@
+$ cat .dockerignore
+.git
+.env
+*.env
+keys/
+*.pem
+evidence/
+Dockerfile*
+worksheet.md
+*.md
+$ docker run --rm week13-ignore:lab ls -a /app
+.
+..
+.dockerignore
+app.py
+iam-policy-insecure.json
+iam-policy-leastpriv.json
+img
+requirements.txt
+scan.sh
