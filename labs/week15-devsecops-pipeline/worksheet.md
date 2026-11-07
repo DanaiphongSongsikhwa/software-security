@@ -156,15 +156,21 @@ Task 1b screenshot:
 
 #### Task 2 — Answer
 
-I copied `security-ci.yml` into `.github/workflows/` of a public repo I own and pushed it, so the three jobs (`semgrep`, `trivy`, `gitleaks`) run on every push and PR to `main`, and the report steps upload SARIF to the Security tab.
+I copied `security-ci.yml` into `.github/workflows/` of my own public throwaway repo (`DanaiphongSongsikhwa/wk15-devsecops-6631503106`) and pushed it, so the three jobs (`semgrep`, `trivy`, `gitleaks`) run on every push and PR to `main`, and the report steps upload SARIF to the Security tab. Run #1 finished in about 46 seconds with all three checks green: `security-ci / SAST (Semgrep)`, `security-ci / SCA + IaC (Trivy)`, and `security-ci / Secrets (Gitleaks)`.
+
+The SARIF uploads show up under **Security → Code scanning**, where I can see 2 open alerts, both the Semgrep `avoid_app_run_with_bad_host` warning on `secure_service.py:81` and `insecure_service.py:56`. These are Warning level, below the gate's `HIGH,CRITICAL` filter, which is exactly why they appear in the Security tab but still let the build pass (Part 2 question 1).
 
 One real problem I found while preparing this: the template pins `aquasecurity/trivy-action@0.24.0`, but that tag no longer resolves on GitHub (the action now uses `v`-prefixed tags like `v0.36.0`). Left as is, the `trivy` job cannot download the action and fails before scanning. I pinned it to a current commit SHA in my repo's copy (see Task 3), so the gate runs for real.
 
-[TODO: Actions run link and screenshot once the repo is pushed]
+Repo: `https://github.com/DanaiphongSongsikhwa/wk15-devsecops-6631503106`
 
-Task 2 screenshot:
+Task 2 screenshot (green build):
 
-![Task 2 - Actions run with the three jobs and the Code scanning alerts page](img/task2.png)
+![Task 2 - repo with all security-ci checks passed](img/task2.png)
+
+Code scanning alerts (SARIF from the report steps):
+
+![Task 2 - Code scanning alerts: the 2 Semgrep warnings that pass the gate](img/task3.png)
 
 - **Task 3 — Blue team: pass the gate (30 min).** *Goal:* a green build. *Deliverable:* link to the passing run.
 
@@ -180,6 +186,8 @@ I ran all three scanners on a copy of the lab locally first, to see the red base
 | Trivy fs (SCA + secret) | none (exit 0) | nothing needed |
 | Trivy config (IaC) | none (exit 0) | nothing needed |
 
+Run #1 on my repo went green on the first try (all three jobs passed), so the Blue-team gate is clean. The passing run is on `DanaiphongSongsikhwa/wk15-devsecops-6631503106`, workflow `security-ci`, run #1.
+
 The SHA pins I used (resolved with `git ls-remote`):
 
 ```text
@@ -188,9 +196,9 @@ github/codeql-action@v3.39.3      -> 9418214df1f2c4b8128c770156c409013b07d6b9
 aquasecurity/trivy-action@v0.36.0 -> ed142fd0673e97e23eac54620cfb913e5ce36c25
 ```
 
-None of the baseline findings is a real vulnerability. They are all either supply-chain hardening (pin the actions), a justified exception (`0.0.0.0` is needed for Docker), or a false positive (a docs example). I did not use a blanket ignore; each exception has a comment saying why, which is what README section 4 asks for. The prepared files are in `evidence/hardened/` (a pinned `security-ci.yml` and a `.gitleaksignore`).
+None of the baseline findings is a real vulnerability. They are all either supply-chain hardening (pin the actions), a justified exception (`0.0.0.0` is needed for Docker), or a false positive (a docs example). I did not use a blanket ignore; each exception has a comment saying why, which is what README section 4 asks for. The prepared files are in `evidence/hardened/` (a pinned `security-ci.yml` and a path-based `.gitleaks.toml`). I used `.gitleaks.toml` instead of `.gitleaksignore` because a Gitleaks fingerprint includes the commit SHA, so a fingerprint ignore breaks whenever the commit changes; a path/regex allowlist survives.
 
-[TODO: link to the green Actions run once pushed]
+Passing run: `DanaiphongSongsikhwa/wk15-devsecops-6631503106` Actions, `security-ci` run #1 (green).
 
 - **Task 4 — Red team: Break the Build (40 min).** *Goal:* make the gate say **no**. *Deliverable:* screenshot of the failing gate step + which job caught it.
 
@@ -369,7 +377,8 @@ printf '%s | %s | ' "$(whoami)" '6631503106'; TZ=Asia/Bangkok date '+%F %T %Z'
 |---|---|
 | `img/task0.png` | The three `event=` security log lines from `sample-service.py` |
 | `img/task1b.png` | `:8090` leak vs `:8091` deny, plus the hosted instance leaking the personal flag |
-| `img/task2.png` | The Actions run with the three jobs + the Code scanning alerts page |
+| `img/task2.png` | The repo with all three `security-ci` checks passed (green build) |
+| `img/task3.png` | Security → Code scanning alerts (the 2 Semgrep warnings that pass the gate) |
 | `img/task4.png` | A failing gate step on a Red PR |
 
 ## References
