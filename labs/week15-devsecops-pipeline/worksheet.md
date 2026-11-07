@@ -212,13 +212,19 @@ Plan: one PR per planted defect, each aimed at a different gate step. Per the RE
 | 2 | Add a `Dockerfile` that runs as root (no `USER`, or `USER root`) | Trivy config (`Gate — fail on HIGH/CRITICAL (IaC)`, `exit-code: 1`) | DS-0002, HIGH |
 | 3 | Commit a hard-coded token such as `AWS_SECRET_ACCESS_KEY=AKIA...` | Gitleaks (`Gate — fail if any secret found`, `--exit-code 1`) | Secret match |
 
-Each defect goes in its own PR (the worksheet says 1 defect per PR), opened inside my own repo, never against the course repo.
+Each defect goes in its own PR (the worksheet says 1 defect per PR), opened inside my own repo (`wk15-devsecops-6631503106`), never against the course repo. I opened all three and watched the gate:
 
-[TODO: open the three PRs and screenshot each failing gate step]
+| PR | Branch | Gate step that failed | Enforced by |
+|---|---|---|---|
+| #1 red: add service deps | `redteam/vuln-dep` | `SCA + IaC (Trivy)` | Trivy fs `exit-code: 1` — urllib3 1.26.4 has HIGH CVEs (CVE-2021-33503, CVE-2023-43804) |
+| #2 red: containerize the service | `redteam/root-dockerfile` | `SCA + IaC (Trivy)` | Trivy config `exit-code: 1` — DS-0002, HIGH (no `USER`, runs as root) |
+| #3 red: add deploy config | `redteam/hardcoded-token` | `Secrets (Gitleaks)` **and** `SCA + IaC (Trivy)` | Gitleaks `--exit-code 1` (rule `github-pat`) and Trivy's secret scanner both caught the `ghp_...` token |
 
-Task 4 screenshot:
+PR #3 is a good example of defence in depth: the one planted token trips two different gate steps, because the Trivy fs gate runs `scanners: vuln,secret`, so Gitleaks is not the only thing watching for secrets. The Code scanning tab also shows a new Trivy alert (1 critical) from the report step on that PR. The planted token is a randomly generated fake `ghp_` value, not a real credential.
 
-![Task 4 - the failing gate step and which job caught it](img/task4.png)
+Task 4 screenshot (PR #3 checks: Trivy and Gitleaks both red):
+
+![Task 4 - the failing gate steps (Trivy + Gitleaks) on the token PR, with 3 successful and 3 failing checks](img/task4.png)
 
 - **Task 5 — Score Break-the-Build (25 min).** *Goal:* tally Red vs Blue. *Deliverable:* scoreboard + one proposed gate improvement.
 
@@ -373,13 +379,13 @@ Every screenshot must show the terminal stamp. For browser pages, put the termin
 printf '%s | %s | ' "$(whoami)" '6631503106'; TZ=Asia/Bangkok date '+%F %T %Z'
 ```
 
-| File | What to show |
-|---|---|
-| `img/task0.png` | The three `event=` security log lines from `sample-service.py` |
-| `img/task1b.png` | `:8090` leak vs `:8091` deny, plus the hosted instance leaking the personal flag |
-| `img/task2.png` | The repo with all three `security-ci` checks passed (green build) |
-| `img/task3.png` | Security → Code scanning alerts (the 2 Semgrep warnings that pass the gate) |
-| `img/task4.png` | A failing gate step on a Red PR |
+| File | What to show | Status |
+|---|---|---|
+| `img/task0.png` | The three `event=` security log lines from `sample-service.py` | still to capture |
+| `img/task1b.png` | `:8090` leak vs `:8091` deny, plus the hosted instance leaking the personal flag | still to capture |
+| `img/task2.png` | The repo with all three `security-ci` checks passed (green build) | done |
+| `img/task3.png` | Security → Code scanning alerts (the 2 Semgrep warnings that pass the gate) | done |
+| `img/task4.png` | The failing gate steps (Trivy + Gitleaks) on a Red PR | done |
 
 ## References
 
