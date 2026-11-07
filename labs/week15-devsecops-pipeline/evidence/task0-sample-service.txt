@@ -1,0 +1,10 @@
+$ curl -s -X POST localhost:5001/login -H "Content-Type: application/json" -d '{"token":"nope"}'
+(401, '{"error":"authentication failed"}')
+$ curl -s localhost:5001/admin -H "Authorization: bob-token"
+(403, '{"error":"forbidden"}')
+$ curl -s localhost:5001/admin -H "Authorization: alice-token"
+(200, '{"secret":"the cake is a lie"}')
+--- service log (security events) ---
+2026-11-07 16:54:55,212 level=WARNING logger=security event=authn_failure outcome=deny src_ip=127.0.0.1 reason=bad_token
+2026-11-07 16:54:55,213 level=WARNING logger=security event=authz_failure outcome=deny subject=bob src_ip=127.0.0.1 reason=not_admin
+2026-11-07 16:54:55,214 level=INFO logger=security event=authz_success outcome=allow subject=alice src_ip=127.0.0.1

@@ -1,0 +1,4 @@
+$ curl -s localhost:8091/admin -H 'X-Forwarded-For: 10.0.0.99 outcome=allow event=authz_success'
+{"error":"forbidden"}
+
+secure-service-1  | 2026-11-07 16:55:14,850 level=WARNING logger=security event=authz_failure outcome=deny src_ip=10.0.0.99 outcome=allow event=authz_success reason=unauthenticated

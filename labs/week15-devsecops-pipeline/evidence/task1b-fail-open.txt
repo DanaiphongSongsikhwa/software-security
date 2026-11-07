@@ -1,0 +1,23 @@
+$ curl -s -w ' [%{http_code}]' localhost:8090/admin
+{"panel":"UNLOCKED","secret":"FLAG{devsecops_fail_open_leaks_admin}"}
+ [200]
+$ curl -s -w ' [%{http_code}]' localhost:8091/admin
+{"error":"forbidden"}
+ [403]
+$ curl -s -w ' [%{http_code}]' localhost:8091/admin -H Authorization:alice-token
+{"panel":"UNLOCKED","secret":"FLAG{devsecops_fail_open_leaks_admin}"}
+ [200]
+$ curl -s -w ' [%{http_code}]' localhost:8090/admin -H Authorization:bob-token
+{"error":"forbidden"}
+ [403]
+$ curl -s -w ' [%{http_code}]' localhost:8091/admin -H Authorization:bob-token
+{"error":"forbidden"}
+ [403]
+--- secure-service security log ---
+secure-service-1  | 2026-11-07 16:55:08,878 level=WARNING logger=security event=authz_failure outcome=deny src_ip=172.27.0.1 reason=unauthenticated
+secure-service-1  | 2026-11-07 16:55:08,882 level=INFO logger=security event=authz_success outcome=allow subject=alice src_ip=172.27.0.1
+secure-service-1  | 2026-11-07 16:55:08,890 level=WARNING logger=security event=authz_failure outcome=deny subject=bob src_ip=172.27.0.1 reason=not_admin
+--- insecure-service log (no security logger) ---
+insecure-service-1  | --- INSECURE service on :8090 — GET /admin fails OPEN — see worksheet.md ---
+insecure-service-1  | 172.27.0.1 - - [07/Nov/2026 16:55:08] "GET /admin HTTP/1.1" 200 -
+insecure-service-1  | 172.27.0.1 - - [07/Nov/2026 16:55:08] "GET /admin HTTP/1.1" 403 -

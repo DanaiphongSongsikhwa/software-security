@@ -1,0 +1,5 @@
+RuleID:      curl-auth-header
+File:        README-pipeline.md
+Line:        91
+Fingerprint: 2d6e27c8ce780f51f5138fc608bb1b81373fc713:README-pipeline.md:curl-auth-header:91
+5:03PM WRN leaks found: 1
