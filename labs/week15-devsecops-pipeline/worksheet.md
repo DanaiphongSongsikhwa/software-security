@@ -148,9 +148,9 @@ $ curl -s -w ' [%{http_code}]' http://10.66.0.1:30000/admin
 
 My flag is `FLAG{devsecops_586bc26d447c1971}`, which is different from the local demo flag.
 
-Task 1b screenshot:
+Task 1b screenshot (the local `:8090` fail-open vs `:8091` fail-closed contrast; the hosted instance had expired by the time of this capture, so its line is empty — the personal flag is recorded in `evidence/ctf-flag.txt` above):
 
-![Task 1b - :8090 leak vs :8091 deny, and the hosted instance leaking the personal flag](img/task1b.png)
+![Task 1b - :8090 leak vs :8091 deny, real admin still works](img/task1b.png)
 
 - **Task 2 — Stand up the gate (35 min).** *Goal:* get the workflow running. *Deliverable:* screenshot of the Actions run + the Code scanning alerts page.
 
@@ -381,8 +381,8 @@ printf '%s | %s | ' "$(whoami)" '6631503106'; TZ=Asia/Bangkok date '+%F %T %Z'
 
 | File | What to show | Status |
 |---|---|---|
-| `img/task0.png` | The three `event=` security log lines from `sample-service.py` | still to capture |
-| `img/task1b.png` | `:8090` leak vs `:8091` deny, plus the hosted instance leaking the personal flag | still to capture |
+| `img/task0.png` | The three `event=` security log lines from `sample-service.py` | done |
+| `img/task1b.png` | `:8090` leak vs `:8091` deny, real admin still works | done |
 | `img/task2.png` | The repo with all three `security-ci` checks passed (green build) | done |
 | `img/task3.png` | Security → Code scanning alerts (the 2 Semgrep warnings that pass the gate) | done |
 | `img/task4.png` | The failing gate steps (Trivy + Gitleaks) on a Red PR | done |
