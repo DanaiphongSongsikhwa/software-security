@@ -105,7 +105,7 @@ Failures: 4 (MEDIUM: 1, HIGH: 1, CRITICAL: 2)
 
 **Baseline:** `Dockerfile.insecure` has **4** findings (1 MEDIUM, 1 HIGH, 2 CRITICAL). The hardened file has 0. The IAM JSON files are not in the table because Trivy does not scan them, so I checked them by hand in Task 2.
 
-**Task 0 screenshot**
+**Task 0 screenshot** (the second table in the picture is the optional `trivy image` part of `scan.sh`, which also shows the 69 OS CVEs in the hardened image used in Task 4)
 
 ![Task 0 - docker version and baseline scan.sh summary (insecure 4, hardened 0)](img/task0.png)
 
