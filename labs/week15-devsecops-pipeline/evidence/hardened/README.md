@@ -5,7 +5,7 @@ throwaway public repo you own (never the course repo, never a private repo).
 
 ## Layout in your repo
     .github/workflows/security-ci.yml   <- evidence/hardened/security-ci.yml (actions pinned to SHAs)
-    .gitleaksignore                     <- evidence/hardened/.gitleaksignore (docs false positive)
+    .gitleaks.toml                      <- evidence/hardened/.gitleaks.toml (path allowlist for docs false positive)
     insecure_service.py, secure_service.py, sample-service.py, docker-compose.yml,
     README.md, README-pipeline.md       <- copies of this lab folder
 
@@ -18,7 +18,7 @@ app.run line, e.g.:
 ## Why these changes (Task 3)
 - Actions pinned to commit SHAs  -> clears Semgrep github-actions-mutable-action-tag
 - nosemgrep on host="0.0.0.0"     -> justified exception, not a blanket ignore
-- .gitleaksignore fingerprint     -> the README curl example is a docs false positive
+- .gitleaks.toml path allowlist   -> the README curl example is a docs false positive (path-based, survives commits)
 - trivy-action pinned to v0.36.0  -> the template's @0.24.0 tag no longer resolves on GitHub
 
 ## Task 4 (Red): open ONE PR per planted defect, each hits a different gate step

@@ -1,0 +1,18 @@
+# Week 15 lab — Gitleaks config.
+# Use the full default rule set, then allow-list the pipeline guide's own
+# curl examples. Those -H 'Authorization: alice-token' / 'bob-token' lines are
+# documentation demo tokens, not real secrets (a false positive, per worksheet
+# Task 3). Path-based so it survives commits (fingerprints include the SHA).
+title = "week15-devsecops"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Docs curl examples use demo tokens, not real secrets"
+paths = [
+  '''README-pipeline\.md''',
+]
+regexes = [
+  '''Authorization: (alice|bob)-token''',
+]

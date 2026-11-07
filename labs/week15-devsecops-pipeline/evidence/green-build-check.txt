@@ -1,0 +1,1 @@
+GREEN BUILD CHECK (all must be 0): semgrep=0 trivy-fs=0 trivy-config=0 gitleaks=0
